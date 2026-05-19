@@ -1,0 +1,33 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function ownsUserDocument(userId) {
+      return signedIn() && request.auth.uid == userId;
+    }
+
+    match /users/{userId} {
+      allow read, write: if ownsUserDocument(userId);
+
+      match /profile/{docId} {
+        allow read, write: if ownsUserDocument(userId);
+      }
+
+      match /settings/{docId} {
+        allow read, write: if ownsUserDocument(userId);
+      }
+
+      match /transactions/{transactionId} {
+        allow read, write: if ownsUserDocument(userId);
+      }
+
+      match /history/{historyId} {
+        allow read, write: if ownsUserDocument(userId);
+      }
+    }
+  }
+}
